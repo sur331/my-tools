@@ -1,1 +1,525 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مركز الأدوات الذكية الشامل</title>
+  <style>
+    :root {
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%);
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --sidebar-bg: rgba(255, 255, 255, 0.85);
+      --text: #0f172a;
+      --border: rgba(226, 232, 240, 0.8);
+    }
 
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, sans-serif;
+      background: var(--bg-gradient);
+      background-attachment: fixed;
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .layout-wrapper {
+      display: flex;
+      min-height: 100vh;
+      flex-direction: column;
+      backdrop-filter: blur(10px);
+    }
+
+    @media (min-width: 768px) {
+      .layout-wrapper { flex-direction: row; }
+    }
+
+    .sidebar {
+      width: 100%;
+      background: var(--sidebar-bg);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 1.25rem;
+      box-sizing: border-box;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    @media (min-width: 768px) {
+      .sidebar {
+        width: 300px;
+        border-bottom: none;
+        border-left: 1px solid var(--border);
+        min-height: 100vh;
+        position: sticky;
+        top: 0;
+      }
+    }
+
+    .sidebar h2 {
+      margin-top: 0;
+      color: var(--primary-hover);
+      font-size: 1.3rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 2px solid var(--primary);
+    }
+
+    .nav-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      max-height: 350px;
+      overflow-y: auto;
+    }
+
+    @media (min-width: 768px) {
+      .nav-list { max-height: calc(100vh - 100px); }
+    }
+
+    .nav-btn {
+      width: 100%;
+      text-align: right;
+      padding: 0.75rem 1rem;
+      margin-bottom: 0.35rem;
+      border: 1px solid transparent;
+      background: transparent;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text);
+      transition: all 0.25s ease;
+    }
+
+    .nav-btn:hover {
+      background: rgba(99, 102, 241, 0.1);
+      color: var(--primary-hover);
+    }
+
+    .nav-btn.active {
+      background: var(--primary);
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+    }
+
+    .main-content {
+      flex: 1;
+      padding: 2rem 1.5rem;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .tool-card {
+      display: none;
+      width: 100%;
+      max-width: 580px;
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      box-sizing: border-box;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .tool-card.active { display: block; }
+
+    .tool-card h3 {
+      margin-top: 0;
+      color: var(--primary-hover);
+      font-size: 1.35rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .input-group { margin-bottom: 1.2rem; }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    .input-group input, .input-group textarea {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      box-sizing: border-box;
+      font-size: 0.95rem;
+      outline: none;
+      background: #f8fafc;
+    }
+
+    .input-group input:focus, .input-group textarea:focus {
+      border-color: var(--primary);
+      background: #ffffff;
+    }
+
+    .action-btn {
+      width: 100%;
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.85rem;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.2s;
+    }
+
+    .action-btn:hover {
+      background: var(--primary-hover);
+    }
+
+    .result-box {
+      margin-top: 1.25rem;
+      padding: 1rem;
+      background: #f1f5f9;
+      border: 2px dashed var(--primary);
+      border-radius: 8px;
+      text-align: center;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<div class="layout-wrapper">
+  <aside class="sidebar">
+    <h2>🛠️ كافة الأدوات</h2>
+    <ul class="nav-list">
+      <li><button class="nav-btn active" onclick="switchTool(event, 'shortener')">🔗 اختصار الروابط</button></li>
+      <li><button class="nav-btn" onclick="switchTool(event, 'qr')">🔒 مولد رمز QR</button></li>
+      <li><button class="nav-btn" onclick="switchTool(event, 'bmi')">⚖️ حاسبة كتلة الجسم (BMI)</button></li>
+      <li><button class="nav-btn" onclick="switchTool(event, 'age')">⏳ حاسبة العمر الدقيقة</button></li>
+      <li><button class="nav-btn" onclick="switchTool(event, 'discount')">🏷️ حاسبة الخصم</button></li>
+      <li><button class="nav-btn" onclick="switchTool(event, 'pass')">🔑 مولد كلمات المرور</button></li>
+      <li><button class="nav-btn" onclick="switchTool(event, 'counter')">📝 عداد الكلمات والحروف</button></li>
+      <li><button class="nav-btn" onclick="switchTool(event, 'case')">🔤 محول حالة الحروف</button></li>
+      <li><button class="nav-btn" onclick="switchTool(event, 'bmr')">⏱️ حاسبة السعرات الحرارية</button></li>
+      <li><button class="nav-btn" onclick="switchTool(event, 'percent')">📐 حاسبة النسبة المئوية</button></li>
+      <li><button class="nav-btn" onclick="switchTool(event, 'color')">🎨 منتقي أكواد الألوان</button></li>
+      <li><button class="nav-btn" onclick="switchTool(event, 'reverse')">🔄 أداة عكس النصوص</button></li>
+      <li><button class="nav-btn" onclick="switchTool(event, 'seconds')">🕒 تحويل الثواني</button></li>
+      <li><button class="nav-btn" onclick="switchTool(event, 'txt')">📄 محرر وصانع ملفات TXT</button></li>
+      <li><button class="nav-btn" onclick="switchTool(event, 'random')">🎲 مولد الأرقام العشوائية</button></li>
+      <li><button class="nav-btn" onclick="switchTool(event, 'calc')">🧮 الحاسبة السريعة</button></li>
+      <li><button class="nav-btn" onclick="switchTool(event, 'url')">🔍 فاحص ومحلل الروابط</button></li>
+    </ul>
+  </aside>
+
+  <main class="main-content">
+    
+    <!-- 1. Shortener -->
+    <div id="tool-shortener" class="tool-card active">
+      <h3>🔗 أداة اختصار الروابط السريعة</h3>
+      <div class="input-group">
+        <label>ضع الرابط الطويل هنا:</label>
+        <input type="text" id="shortUrlIn" placeholder="https://example.com/very-long-link">
+      </div>
+      <button class="action-btn" onclick="runShortener()">اختصار الرابط الآن</button>
+      <div id="res-shortener" class="result-box"></div>
+    </div>
+
+    <!-- 2. QR Code -->
+    <div id="tool-qr" class="tool-card">
+      <h3>🔒 مولد رمز QR</h3>
+      <div class="input-group">
+        <label>أدخل الرابط أو النص:</label>
+        <input type="text" id="qrIn" placeholder="https://example.com">
+      </div>
+      <button class="action-btn" onclick="runQR()">إنشاء الرمز</button>
+      <div id="res-qr" class="result-box"></div>
+    </div>
+
+    <!-- 3. BMI -->
+    <div id="tool-bmi" class="tool-card">
+      <h3>⚖️ حاسبة كتلة الجسم (BMI)</h3>
+      <div class="input-group"><label>الوزن (كجم):</label><input type="number" id="bmiW" placeholder="70"></div>
+      <div class="input-group"><label>الطول (سم):</label><input type="number" id="bmiH" placeholder="175"></div>
+      <button class="action-btn" onclick="runBMI()">احسب النتيجة</button>
+      <div id="res-bmi" class="result-box"></div>
+    </div>
+
+    <!-- 4. Age -->
+    <div id="tool-age" class="tool-card">
+      <h3>⏳ حاسبة العمر الدقيقة</h3>
+      <div class="input-group"><label>تاريخ الميلاد:</label><input type="date" id="ageIn"></div>
+      <button class="action-btn" onclick="runAge()">احسب العمر</button>
+      <div id="res-age" class="result-box"></div>
+    </div>
+
+    <!-- 5. Discount -->
+    <div id="tool-discount" class="tool-card">
+      <h3>🏷️ حاسبة الخصم</h3>
+      <div class="input-group"><label>السعر الأصلي:</label><input type="number" id="discP" placeholder="200"></div>
+      <div class="input-group"><label>نسبة الخصم (%):</label><input type="number" id="discD" placeholder="15"></div>
+      <button class="action-btn" onclick="runDisc()">احسب النهائي</button>
+      <div id="res-discount" class="result-box"></div>
+    </div>
+
+    <!-- 6. Password -->
+    <div id="tool-pass" class="tool-card">
+      <h3>🔑 مولد كلمات المرور</h3>
+      <div class="input-group"><label>طول كلمة المرور:</label><input type="number" id="passL" value="12" min="6" max="32"></div>
+      <button class="action-btn" onclick="runPass()">توليد كلمة المرور</button>
+      <div id="res-pass" class="result-box" style="word-break:break-all;"></div>
+    </div>
+
+    <!-- 7. Counter -->
+    <div id="tool-counter" class="tool-card">
+      <h3>📝 عداد الكلمات والحروف</h3>
+      <div class="input-group"><textarea id="cntIn" rows="5" placeholder="اكتب النص هنا..."></textarea></div>
+      <div class="result-box" style="display:block;">
+        الكلمات: <b id="cntW" style="color:var(--primary);">0</b> | الحروف: <b id="cntC" style="color:#10b981;">0</b>
+      </div>
+    </div>
+
+    <!-- 8. Case -->
+    <div id="tool-case" class="tool-card">
+      <h3>🔤 محول حالة الحروف</h3>
+      <div class="input-group"><textarea id="caseIn" rows="4" placeholder="Enter English text..."></textarea></div>
+      <div style="display:flex; gap:10px;">
+        <button class="action-btn" onclick="runCase('upper')">حروف كبيرة (UPPER)</button>
+        <button class="action-btn" style="background:#0284c7;" onclick="runCase('lower')">حروف صغيرة (lower)</button>
+      </div>
+    </div>
+
+    <!-- 9. BMR -->
+    <div id="tool-bmr" class="tool-card">
+      <h3>⏱️ حاسبة السعرات الحرارية</h3>
+      <div class="input-group"><label>الوزن (كجم):</label><input type="number" id="bmrW"></div>
+      <div class="input-group"><label>الطول (سم):</label><input type="number" id="bmrH"></div>
+      <div class="input-group"><label>العمر:</label><input type="number" id="bmrA"></div>
+      <button class="action-btn" onclick="runBMR()">احسب السعرات</button>
+      <div id="res-bmr" class="result-box"></div>
+    </div>
+
+    <!-- 10. Percent -->
+    <div id="tool-percent" class="tool-card">
+      <h3>📐 حاسبة النسبة المئوية</h3>
+      <div class="input-group"><label>كم يساوي نسبة (%):</label><input type="number" id="pctN"></div>
+      <div class="input-group"><label>من العدد الإجمالي:</label><input type="number" id="pctT"></div>
+      <button class="action-btn" onclick="runPct()">احسب النتيجة</button>
+      <div id="res-percent" class="result-box"></div>
+    </div>
+
+    <!-- 11. Color -->
+    <div id="tool-color" class="tool-card">
+      <h3>🎨 منتقي أكواد الألوان</h3>
+      <div class="input-group"><input type="color" id="clrIn" value="#6366f1" style="height:50px; cursor:pointer;" onchange="runColor()"></div>
+      <div class="result-box" style="display:block;">الكود: <b id="res-color" style="color:var(--primary);">#6366f1</b></div>
+    </div>
+
+    <!-- 12. Reverse -->
+    <div id="tool-reverse" class="tool-card">
+      <h3>🔄 أداة عكس النصوص</h3>
+      <div class="input-group"><textarea id="revIn" rows="4" placeholder="اكتب هنا..."></textarea></div>
+      <button class="action-btn" onclick="runRev()">عكس النص</button>
+      <div id="res-reverse" class="result-box" style="word-break:break-all;"></div>
+    </div>
+
+    <!-- 13. Seconds -->
+    <div id="tool-seconds" class="tool-card">
+      <h3>🕒 تحويل الثواني</h3>
+      <div class="input-group"><label>عدد الثواني:</label><input type="number" id="secIn"></div>
+      <button class="action-btn" onclick="runSec()">تحويل</button>
+      <div id="res-seconds" class="result-box"></div>
+    </div>
+
+    <!-- 14. TXT -->
+    <div id="tool-txt" class="tool-card">
+      <h3>📄 صانع ملفات TXT</h3>
+      <div class="input-group"><textarea id="txtIn" rows="5" placeholder="محتوى الملف..."></textarea></div>
+      <button class="action-btn" onclick="runTxt()">تحميل TXT ⬇️</button>
+    </div>
+
+    <!-- 15. Random -->
+    <div id="tool-random" class="tool-card">
+      <h3>🎲 مولد الأرقام العشوائية</h3>
+      <div class="input-group"><label>من:</label><input type="number" id="rndMin" value="1"></div>
+      <div class="input-group"><label>إلى:</label><input type="number" id="rndMax" value="100"></div>
+      <button class="action-btn" onclick="runRnd()">توليد رقم</button>
+      <div id="res-random" class="result-box"></div>
+    </div>
+
+    <!-- 16. Calculator -->
+    <div id="tool-calc" class="tool-card">
+      <h3>🧮 الحاسبة السريعة</h3>
+      <div class="input-group"><label>العملية الحسابية:</label><input type="text" id="calcIn" placeholder="50 * 2 + 10"></div>
+      <button class="action-btn" onclick="runCalc()">حساب</button>
+      <div id="res-calc" class="result-box"></div>
+    </div>
+
+    <!-- 17. URL -->
+    <div id="tool-url" class="tool-card">
+      <h3>🔍 فاحص ومحلل الروابط</h3>
+      <div class="input-group"><label>الرابط:</label><input type="text" id="urlIn" placeholder="https://example.com"></div>
+      <button class="action-btn" onclick="runUrl()">فحص الرابط</button>
+      <div id="res-url" class="result-box" style="text-align:right;"></div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  function switchTool(event, toolId) {
+    document.querySelectorAll('.tool-card').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    
+    document.getElementById('tool-' + toolId).classList.add('active');
+    event.currentTarget.classList.add('active');
+  }
+
+  function showRes(id, text) {
+    let el = document.getElementById('res-' + id);
+    el.style.display = 'block';
+    el.innerHTML = text;
+  }
+
+  function runShortener() {
+    let url = document.getElementById('shortUrlIn').value.trim();
+    let res = document.getElementById('res-shortener');
+    if (!url) return alert('يرجى إدخال الرابط أولاً');
+    if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+
+    res.style.display = 'block';
+    res.innerHTML = 'جاري اختصار الرابط... ⏳';
+
+    let apiUrl = `https://api.allorigins.win/get?url=${encodeURIComponent('https://tinyurl.com/api-create.php?url=' + url)}`;
+
+    fetch(apiUrl)
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .then(d => {
+        let shortUrl = d.contents;
+        if (shortUrl && shortUrl.startsWith('http')) {
+          res.innerHTML = `
+            <p style="margin:0 0 10px 0; color:#10b981; font-weight:bold;">تم اختصار الرابط بنجاح! 🎉</p>
+            <input type="text" value="${shortUrl}" readonly style="width:100%; text-align:center; padding:8px; border:1px solid #ccc; border-radius:5px; margin-bottom:10px; box-sizing:border-box;">
+            <button onclick="navigator.clipboard.writeText('${shortUrl}'); alert('تم النسخ!');" class="action-btn">نسخ الرابط</button>
+          `;
+        } else { throw new Error(); }
+      })
+      .catch(() => { res.innerHTML = '<span style="color:#ef4444;">حدث خطأ أثناء اختصار الرابط. تأكد من صحة الرابط.</span>'; });
+  }
+
+  function runQR() {
+    let val = document.getElementById('qrIn').value.trim();
+    if(val) showRes('qr', `<img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(val)}" alt="QR">`);
+  }
+
+  function runBMI() {
+    let w = parseFloat(document.getElementById('bmiW').value);
+    let h = parseFloat(document.getElementById('bmiH').value)/100;
+    if(w>0 && h>0) {
+      let bmi = (w/(h*h)).toFixed(1);
+      let s = bmi < 18.5 ? "نقص وزن" : bmi < 25 ? "وزن مثالي" : bmi < 30 ? "زيادة وزن" : "سمنة";
+      showRes('bmi', `النتيجة: <b>${bmi}</b> (${s})`);
+    }
+  }
+
+  function runAge() {
+    let b = new Date(document.getElementById('ageIn').value);
+    if(!isNaN(b)) showRes('age', `العمر الحالي: <b>${new Date().getFullYear() - b.getFullYear()} سنة</b>`);
+  }
+
+  function runDisc() {
+    let p = parseFloat(document.getElementById('discP').value);
+    let d = parseFloat(document.getElementById('discD').value);
+    if(p>0 && d>=0) showRes('discount', `السعر النهائي: <b>${(p - (p*d/100)).toFixed(2)}</b>`);
+  }
+
+  function runPass() {
+    let l = document.getElementById('passL').value;
+    let c = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()";
+    let p = "";
+    for(let i=0; i<l; i++) p += c.charAt(Math.floor(Math.random() * c.length));
+    showRes('pass', `كلمة المرور: <b>${p}</b>`);
+  }
+
+  document.getElementById('cntIn').addEventListener('input', function() {
+    let t = this.value.trim();
+    document.getElementById('cntC').textContent = t.length;
+    document.getElementById('cntW').textContent = t ? t.split(/\s+/).length : 0;
+  });
+
+  function runCase(type) {
+    let t = document.getElementById('caseIn').value;
+    document.getElementById('caseIn').value = type === 'upper' ? t.toUpperCase() : t.toLowerCase();
+  }
+
+  function runBMR() {
+    let w = parseFloat(document.getElementById('bmrW').value);
+    let h = parseFloat(document.getElementById('bmrH').value);
+    let a = parseFloat(document.getElementById('bmrA').value);
+    if(w&&h&&a) showRes('bmr', `المعدل اليومي: <b>${Math.round((10*w)+(6.25*h)-(5*a)+5)} سعرة</b>`);
+  }
+
+  function runPct() {
+    let n = parseFloat(document.getElementById('pctN').value);
+    let t = parseFloat(document.getElementById('pctT').value);
+    if(n>=0 && t>0) showRes('percent', `النتيجة: <b>${((n/100)*t).toFixed(2)}</b>`);
+  }
+
+  function runColor() {
+    let c = document.getElementById('clrIn').value;
+    let el = document.getElementById('res-color');
+    el.innerText = c;
+    el.style.color = c;
+  }
+
+  function runRev() {
+    let t = document.getElementById('revIn').value;
+    if(t) showRes('reverse', `المعكوس: <b>${t.split('').reverse().join('')}</b>`);
+  }
+
+  function runSec() {
+    let s = parseInt(document.getElementById('secIn').value);
+    if(s>=0) showRes('seconds', `<b>${Math.floor(s/3600)} ساعة و ${Math.floor((s%3600)/60)} دقيقة و ${s%60} ثانية</b>`);
+  }
+
+  function runTxt() {
+    let t = document.getElementById('txtIn').value;
+    if(!t) return;
+    let a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([t], {type: 'text/plain;charset=utf-8'}));
+    a.download = "file.txt";
+    a.click();
+  }
+
+  function runRnd() {
+    let min = parseInt(document.getElementById('rndMin').value);
+    let max = parseInt(document.getElementById('rndMax').value);
+    if(max>min) showRes('random', `الرقم: <b>${Math.floor(Math.random()*(max-min+1))+min}</b>`);
+  }
+
+  function runCalc() {
+    let exp = document.getElementById('calcIn').value;
+    try {
+      if(exp && !/[^0-9+\-*/.() ]/.test(exp)) showRes('calc', `النتيجة: <b>${Function('"use strict"; return (' + exp + ')')()}</b>`);
+    } catch(e) { alert('عملية غير صحيحة'); }
+  }
+
+  function runUrl() {
+    let u = document.getElementById('urlIn').value.trim();
+    if(!u) return;
+    if(!/^https?:\/\//i.test(u)) u = 'https://' + u;
+    try {
+      let parsed = new URL(u);
+      showRes('url', `<b>النطاق:</b> ${parsed.hostname}<br><b>الأمان:</b> ${parsed.protocol==='https:'?'آمن (HTTPS)':'غير آمن (HTTP)'}`);
+    } catch(e) { alert('رابط غير صحيح'); }
+  }
+</script>
+
+</body>
+</html>
