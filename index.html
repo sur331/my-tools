@@ -175,6 +175,10 @@
       cursor: pointer;
       font-size: 1rem;
       transition: all 0.2s;
+      text-decoration: none;
+      display: inline-block;
+      box-sizing: border-box;
+      text-align: center;
     }
 
     .action-btn:hover {
@@ -387,7 +391,7 @@
     el.innerHTML = text;
   }
 
-  async function runShortener() {
+  function runShortener() {
     let url = document.getElementById('shortUrlIn').value.trim();
     let res = document.getElementById('res-shortener');
     if (!url) return alert('يرجى إدخال الرابط أولاً');
@@ -397,28 +401,16 @@
     }
 
     res.style.display = 'block';
-    res.innerHTML = 'جاري اختصار الرابط... ⏳';
-
-    try {
-      let targetUrl = `https://is.gd/create.php?format=json&url=${encodeURIComponent(url)}`;
-      let proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
-      
-      let response = await fetch(proxyUrl);
-      let data = await response.json();
-
-      if (data && data.shorturl) {
-        let shortUrl = data.shorturl;
-        res.innerHTML = `
-          <p style="margin:0 0 10px 0; color:#10b981; font-weight:bold;">تم اختصار الرابط بنجاح! 🎉</p>
-          <input type="text" value="${shortUrl}" readonly style="width:100%; text-align:center; padding:8px; border:1px solid #ccc; border-radius:5px; margin-bottom:10px; box-sizing:border-box;">
-          <button onclick="navigator.clipboard.writeText('${shortUrl}'); alert('تم النسخ!');" class="action-btn">نسخ الرابط</button>
-        `;
-      } else {
-        throw new Error('رابط غير صالحة');
-      }
-    } catch (err) {
-      res.innerHTML = '<span style="color:#ef4444; font-weight:bold;">تأكد من إدخال رابط صحيح، مثال: https://example.com</span>';
-    }
+    
+    // توجيه آمن يفتح أداة TinyURL مباشرة مع إدخال الرابط
+    let tinyUrlTarget = `https://tinyurl.com/create.php?url=${encodeURIComponent(url)}`;
+    
+    res.innerHTML = `
+      <p style="margin:0 0 10px 0; color:#d97706; font-weight:bold;">انقر أدناه لإتمام اختصار الرابط مباشرة عبر TinyURL:</p>
+      <a href="${tinyUrlTarget}" target="_blank" class="action-btn" style="background:#2563eb; text-decoration:none;">
+        🔗 الانتقال لاختصار الرابط (TinyURL)
+      </a>
+    `;
   }
 
   function runQR() {
