@@ -396,21 +396,23 @@
     res.style.display = 'block';
     res.innerHTML = 'جاري اختصار الرابط... ⏳';
 
-    let apiUrl = `https://api.allorigins.win/get?url=${encodeURIComponent('https://tinyurl.com/api-create.php?url=' + url)}`;
-
-    fetch(apiUrl)
-      .then(r => r.ok ? r.json() : Promise.reject())
-      .then(d => {
-        let shortUrl = d.contents;
-        if (shortUrl && shortUrl.startsWith('http')) {
+    fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent(url)}`)
+      .then(r => r.json())
+      .then(data => {
+        if (data.shorturl) {
+          let shortUrl = data.shorturl;
           res.innerHTML = `
             <p style="margin:0 0 10px 0; color:#10b981; font-weight:bold;">تم اختصار الرابط بنجاح! 🎉</p>
             <input type="text" value="${shortUrl}" readonly style="width:100%; text-align:center; padding:8px; border:1px solid #ccc; border-radius:5px; margin-bottom:10px; box-sizing:border-box;">
             <button onclick="navigator.clipboard.writeText('${shortUrl}'); alert('تم النسخ!');" class="action-btn">نسخ الرابط</button>
           `;
-        } else { throw new Error(); }
+        } else {
+          throw new Error();
+        }
       })
-      .catch(() => { res.innerHTML = '<span style="color:#ef4444;">حدث خطأ أثناء اختصار الرابط. تأكد من صحة الرابط.</span>'; });
+      .catch(() => {
+        res.innerHTML = '<span style="color:#ef4444;">حدث خطأ أثناء اختصار الرابط. تأكد من صحة الرابط أو جرب لاحقاً.</span>';
+      });
   }
 
   function runQR() {
