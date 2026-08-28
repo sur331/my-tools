@@ -400,26 +400,24 @@
     res.innerHTML = 'جاري اختصار الرابط... ⏳';
 
     try {
-      let apiUrl = `https://tinyurl.com/api-create.php?url=${encodeURIComponent(url)}`;
-      let response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(apiUrl)}`);
+      let targetUrl = `https://is.gd/create.php?format=json&url=${encodeURIComponent(url)}`;
+      let proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
+      
+      let response = await fetch(proxyUrl);
       let data = await response.json();
 
-      if (data.contents && data.contents.startsWith('http')) {
-        let shortUrl = data.contents.trim();
+      if (data && data.shorturl) {
+        let shortUrl = data.shorturl;
         res.innerHTML = `
           <p style="margin:0 0 10px 0; color:#10b981; font-weight:bold;">تم اختصار الرابط بنجاح! 🎉</p>
           <input type="text" value="${shortUrl}" readonly style="width:100%; text-align:center; padding:8px; border:1px solid #ccc; border-radius:5px; margin-bottom:10px; box-sizing:border-box;">
           <button onclick="navigator.clipboard.writeText('${shortUrl}'); alert('تم النسخ!');" class="action-btn">نسخ الرابط</button>
         `;
       } else {
-        throw new Error('فشل الاختصار');
+        throw new Error('رابط غير صالحة');
       }
     } catch (err) {
-      let directUrl = `https://tinyurl.com/create.php?url=${encodeURIComponent(url)}`;
-      res.innerHTML = `
-        <p style="margin:0 0 10px 0; color:#eab308; font-weight:bold;">يمكنك اختصار الرابط مباشرة عبر الضغط أدناه:</p>
-        <a href="${directUrl}" target="_blank" class="action-btn" style="display:inline-block; text-decoration:none; text-align:center;">الانتقال لاختصار الرابط 🔗</a>
-      `;
+      res.innerHTML = '<span style="color:#ef4444; font-weight:bold;">تأكد من إدخال رابط صحيح، مثال: https://example.com</span>';
     }
   }
 
