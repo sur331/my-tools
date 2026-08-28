@@ -387,7 +387,7 @@
     el.innerHTML = text;
   }
 
-  function runShortener() {
+  async function runShortener() {
     let url = document.getElementById('shortUrlIn').value.trim();
     let res = document.getElementById('res-shortener');
     if (!url) return alert('يرجى إدخال الرابط أولاً');
@@ -399,33 +399,21 @@
     res.style.display = 'block';
     res.innerHTML = 'جاري اختصار الرابط... ⏳';
 
-    let script = document.createElement('script');
-    let callbackName = 'shortenerCB_' + Math.floor(Math.random() * 10000);
-
-    window[callbackName] = function(data) {
-      delete window[callbackName];
-      if (document.body.contains(script)) {
-        document.body.removeChild(script);
-      }
-
-      if (data && data.shorturl) {
-        let shortUrl = data.shorturl;
+    try {
+      let response = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(url)}`);
+      if (response.ok) {
+        let shortUrl = await response.text();
         res.innerHTML = `
           <p style="margin:0 0 10px 0; color:#10b981; font-weight:bold;">تم اختصار الرابط بنجاح! 🎉</p>
           <input type="text" value="${shortUrl}" id="shortResult" readonly style="width:100%; text-align:center; padding:8px; border:1px solid #ccc; border-radius:5px; margin-bottom:10px; box-sizing:border-box; font-weight:bold; color:#2563eb;">
           <button onclick="navigator.clipboard.writeText('${shortUrl}'); alert('تم نسخ الرابط المختصر!');" class="action-btn">نسخ الرابط</button>
         `;
       } else {
-        res.innerHTML = '<span style="color:#ef4444; font-weight:bold;">تعذر اختصار هذا الرابط، يُرجى التأكد من كتابة رابط كامل.</span>';
+        throw new Error('API Error');
       }
-    };
-
-    script.onerror = function() {
-      res.innerHTML = '<span style="color:#ef4444; font-weight:bold;">فشل الاتصال بخادم الاختصار، حاول مجدداً.</span>';
-    };
-
-    script.src = `https://is.gd/create.php?format=json&url=${encodeURIComponent(url)}&callback=${callbackName}`;
-    document.body.appendChild(script);
+    } catch (error) {
+      res.innerHTML = '<span style="color:#ef4444; font-weight:bold;">تعذر الاتصال بخادم الاختصار، تأكد من اتصال الإنترنت ثم حاول ثانية.</span>';
+    }
   }
 
   function runQR() {
