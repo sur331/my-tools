@@ -387,7 +387,7 @@
     el.innerHTML = text;
   }
 
-  function runShortener() {
+  async function runShortener() {
     let url = document.getElementById('shortUrlIn').value.trim();
     let res = document.getElementById('res-shortener');
     if (!url) return alert('يرجى إدخال الرابط أولاً');
@@ -396,23 +396,43 @@
     res.style.display = 'block';
     res.innerHTML = 'جاري اختصار الرابط... ⏳';
 
-    fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent(url)}`)
-      .then(r => r.json())
-      .then(data => {
-        if (data.shorturl) {
-          let shortUrl = data.shorturl;
-          res.innerHTML = `
-            <p style="margin:0 0 10px 0; color:#10b981; font-weight:bold;">تم اختصار الرابط بنجاح! 🎉</p>
-            <input type="text" value="${shortUrl}" readonly style="width:100%; text-align:center; padding:8px; border:1px solid #ccc; border-radius:5px; margin-bottom:10px; box-sizing:border-box;">
-            <button onclick="navigator.clipboard.writeText('${shortUrl}'); alert('تم النسخ!');" class="action-btn">نسخ الرابط</button>
-          `;
-        } else {
-          throw new Error();
-        }
-      })
-      .catch(() => {
-        res.innerHTML = '<span style="color:#ef4444;">حدث خطأ أثناء اختصار الرابط. تأكد من صحة الرابط أو جرب لاحقاً.</span>';
+    try {
+      let response = await fetch(`https://api.shrtco.de/v2/shorten?url=${encodeURIComponent(url)}`);
+      let data = await response.json();
+      
+      if (data.ok) {
+        let shortUrl = data.result.full_short_link;
+        res.innerHTML = `
+          <p style="margin:0 0 10px 0; color:#10b981; font-weight:bold;">تم اختصار الرابط بنجاح! 🎉</p>
+          <input type="text" value="${shortUrl}" readonly style="width:100%; text-align:center; padding:8px; border:1px solid #ccc; border-radius:5px; margin-bottom:10px; box-sizing:border-box;">
+          <button onclick="navigator.clipboard.writeText('${shortUrl}'); alert('تم النسخ!');" class="action-btn">نسخ الرابط</button>
+        `;
+        return;
+      }
+    } catch(e) {}
+
+    // الخطة البديلة في حال فشل المزود الأول (CleanURI API)
+    try {
+      let response = await fetch('https://corsproxy.io/?' + encodeURIComponent('https://cleanuri.com/api/v1/shorten'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ 'url': url })
       });
+      let data = await response.json();
+
+      if (data.result_url) {
+        let shortUrl = data.result_url;
+        res.innerHTML = `
+          <p style="margin:0 0 10px 0; color:#10b981; font-weight:bold;">تم اختصار الرابط بنجاح! 🎉</p>
+          <input type="text" value="${shortUrl}" readonly style="width:100%; text-align:center; padding:8px; border:1px solid #ccc; border-radius:5px; margin-bottom:10px; box-sizing:border-box;">
+          <button onclick="navigator.clipboard.writeText('${shortUrl}'); alert('تم النسخ!');" class="action-btn">نسخ الرابط</button>
+        `;
+      } else {
+        throw new Error();
+      }
+    } catch (err) {
+      res.innerHTML = '<span style="color:#ef4444;">حدث خطأ. يرجى التاكد من إدخال رابط حقيقي مثل https://google.com</span>';
+    }
   }
 
   function runQR() {
