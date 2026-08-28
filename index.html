@@ -391,47 +391,35 @@
     let url = document.getElementById('shortUrlIn').value.trim();
     let res = document.getElementById('res-shortener');
     if (!url) return alert('يرجى إدخال الرابط أولاً');
-    if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+    
+    if (!/^https?:\/\//i.test(url)) {
+      url = 'https://' + url;
+    }
 
     res.style.display = 'block';
     res.innerHTML = 'جاري اختصار الرابط... ⏳';
 
     try {
-      let response = await fetch(`https://api.shrtco.de/v2/shorten?url=${encodeURIComponent(url)}`);
-      let data = await response.json();
-      
-      if (data.ok) {
-        let shortUrl = data.result.full_short_link;
-        res.innerHTML = `
-          <p style="margin:0 0 10px 0; color:#10b981; font-weight:bold;">تم اختصار الرابط بنجاح! 🎉</p>
-          <input type="text" value="${shortUrl}" readonly style="width:100%; text-align:center; padding:8px; border:1px solid #ccc; border-radius:5px; margin-bottom:10px; box-sizing:border-box;">
-          <button onclick="navigator.clipboard.writeText('${shortUrl}'); alert('تم النسخ!');" class="action-btn">نسخ الرابط</button>
-        `;
-        return;
-      }
-    } catch(e) {}
-
-    // الخطة البديلة في حال فشل المزود الأول (CleanURI API)
-    try {
-      let response = await fetch('https://corsproxy.io/?' + encodeURIComponent('https://cleanuri.com/api/v1/shorten'), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({ 'url': url })
-      });
+      let apiUrl = `https://tinyurl.com/api-create.php?url=${encodeURIComponent(url)}`;
+      let response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(apiUrl)}`);
       let data = await response.json();
 
-      if (data.result_url) {
-        let shortUrl = data.result_url;
+      if (data.contents && data.contents.startsWith('http')) {
+        let shortUrl = data.contents.trim();
         res.innerHTML = `
           <p style="margin:0 0 10px 0; color:#10b981; font-weight:bold;">تم اختصار الرابط بنجاح! 🎉</p>
           <input type="text" value="${shortUrl}" readonly style="width:100%; text-align:center; padding:8px; border:1px solid #ccc; border-radius:5px; margin-bottom:10px; box-sizing:border-box;">
           <button onclick="navigator.clipboard.writeText('${shortUrl}'); alert('تم النسخ!');" class="action-btn">نسخ الرابط</button>
         `;
       } else {
-        throw new Error();
+        throw new Error('فشل الاختصار');
       }
     } catch (err) {
-      res.innerHTML = '<span style="color:#ef4444;">حدث خطأ. يرجى التاكد من إدخال رابط حقيقي مثل https://google.com</span>';
+      let directUrl = `https://tinyurl.com/create.php?url=${encodeURIComponent(url)}`;
+      res.innerHTML = `
+        <p style="margin:0 0 10px 0; color:#eab308; font-weight:bold;">يمكنك اختصار الرابط مباشرة عبر الضغط أدناه:</p>
+        <a href="${directUrl}" target="_blank" class="action-btn" style="display:inline-block; text-decoration:none; text-align:center;">الانتقال لاختصار الرابط 🔗</a>
+      `;
     }
   }
 
