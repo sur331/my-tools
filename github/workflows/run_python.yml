@@ -1,31 +1,36 @@
 name: Run Python Shortener
 
-# تشغيل السيرفر تلقائياً عند أي تغيير (Push) في المستودع
+# تشغيل السيرفر الافتراضي تلقائياً عند أي تعديل في الملفات
 on: [push]
+
+# إعطاء السيرفر صلاحية الكتابة وإنشاء الملفات داخل حسابك بنجاح
+permissions:
+  contents: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    # 1. جلب الملفات من مستودعك إلى السيرفر
+    # 1. جلب الملفات من مستودعك الحالي
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    # 2. تثبيت بيئة لغة بايثون على سيرفر Ubuntu
+    # 2. إعداد وتثبيت لغة بايثون بشكل سليم على السيرفر
+    - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.10'
 
-    # 3. تشغيل سكربت البايثون الذي قمنا بكتابته
+    # 3. تشغيل ملف بايثون الرئيسي لاختصار الروابط
     - name: Run shortener script
       run: python shortener.py
 
-    # 4. حفظ الملف الجديد الذي أنشأه البايثون وإعادته إلى حسابك
+    # 4. حفظ ملف النتيجة الناتج وضخه في المستودع
     - name: Commit and push changes
       run: |
         git config --global user.name "GitHub Action"
         git config --global user.email "action@github.com"
         git add shortened_results.txt
-        git commit -m "تحديث الروابط القصير بواسطة بايثون تلقائياً" || exit 0
+        git commit -m "تحديث الروابط القصيرة بواسطة بايثون تلقائياً" || exit 0
         git push
