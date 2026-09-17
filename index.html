@@ -10,10 +10,11 @@
     <div id="python_result_box" style="display: none; margin-top: 20px; padding-top: 20px; border-top: 1px dashed var(--border, #ccc);">
         <p style="margin: 5px 0; color: var(--text, #333);"><strong>الرابط القصير الخاص بك:</strong></p>
         <input type="text" id="python_url_output" readonly style="width: 90%; padding: 10px; background: rgba(0,0,0,0.02); border: 1px solid var(--primary, #6366f1); border-radius: 6px; text-align: left; direction: ltr; font-size: 16px; color: var(--primary, #6366f1); font-weight: bold;" onclick="this.select()">
+        <button onclick="jsCopyLink()" style="background: #28a745; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-size: 14px; width: 95%; margin-top: 8px; font-weight: bold;">نسخ الرابط</button>
     </div>
 </div>
 
-<!-- تحميل بيئة بايثون وتشغيل الكود في نفس المكان تلقائياً -->
+<!-- تحميل بيئة بايثون للويب وتأمين تشغيلها داخلياً -->
 <link rel="stylesheet" href="https://pyscript.net">
 <script type="module" src="https://pyscript.net"></script>
 
@@ -49,4 +50,16 @@ async def run_shortener(event):
 
 document.querySelector("#python_shorten_btn").onclick = run_shortener
 </script>
-<!-- نهاية أداة بايثون -->
+
+<script>
+function jsCopyLink() {
+  var copyText = document.getElementById("python_url_output");
+  if(copyText.value && !copyText.value.includes("جاري")) {
+    copyText.select();
+    copyText.setSelectionRange(0, 99999); // مخصص لمتصفحات الهواتف الذكية
+    navigator.clipboard.writeText(copyText.value);
+    alert("تم نسخ الرابط القصير بنجاح!");
+  }
+}
+</script>
+<!-- نهاية أداة بايثون المتكاملة -->
