@@ -1,165 +1,112 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مركز الأدوات الذكية الشامل</title>
-    
-    <style>
-        :root {
-            --primary: #f38020; /* لون كلاود فلير الرسمي البرتقالي */
-            --primary-hover: #df6d0f;
-            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #1c1917 100%);
-            --card-bg: rgba(255, 255, 255, 0.95);
-            --text: #0f172a;
-            --border: rgba(226, 232, 240, 0.8);
-        }
-
-        body {
-            margin: 0;
-            padding: 20px;
-            background: var(--bg-gradient);
-            font-family: Arial, sans-serif;
-            min-height: 100vh;
-            color: var(--text);
-        }
-
-        .container {
-            max-width: 600px;
-            margin: 30px auto;
-        }
-
-        .tool-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 30px;
-            text-align: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            backdrop-filter: blur(10px);
-        }
-
-        h3 { color: var(--primary); margin-top: 0; font-size: 22px; }
-        p { color: #64748b; font-size: 14px; }
-        
-        input[type="url"], input[type="text"] {
-            width: 90%;
-            padding: 12px;
-            margin: 12px 0;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            text-align: left;
-            direction: ltr;
-            font-size: 16px;
-        }
-
-        button {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            width: 95%;
-            transition: background 0.2s;
-        }
-
-        button:hover { background: var(--primary-hover); }
-        .copy-btn { background: #10b981; margin-top: 8px; }
-        .copy-btn:hover { background: #059669; }
-        
-        .result-box {
-            display: none;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px dashed #cbd5e1;
-        }
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <div class="tool-card">
-        <h3>مركز الأدوات الذكية الشامل</h3>
-        <p>أداة اختصار وتشفير الروابط السحابية المستقلة (تخطي حظر CORS تلقائياً)</p>
-        
-        <input type="url" id="long_url_input" placeholder="ضع الرابط هنا... https://example.com" required>
-        <button onclick="runLocalShortener()">تقصير الرابط الآن</button>
-        
-        <div id="result_box" class="result-box">
-            <p style="margin: 5px 0;"><strong>الرابط الذكي الخاص بك:</strong></p>
-            <input type="text" id="short_url_output" readonly onclick="this.select()">
-            <button onclick="copyLink()" class="copy-btn">نسخ الرابط</button>
-        </div>
-    </div>
+<!-- صندوق أداة اختصار الروابط الذكي والمقاوم للحظر الشامل -->
+<div class="ultimate-shortener-box">
+  <h3>مركز الأدوات الذكية الشامل</h3>
+  <p>أدخل الرابط الطويل في الأسفل للحصول على رابط قصير فوراً وبضغطة زر:</p>
+  
+  <input type="url" id="userLongUrl" placeholder="ضع الرابط هنا... https://example.com" required>
+  <button id="shortenActionBtn" onclick="startInstantShorten()">تقصير الرابط الآن</button>
+  
+  <div id="successResultSection" style="display:none; margin-top:20px; padding-top:15px; border-top:1px dashed #cbd5e1;">
+    <p style="margin:5px 0;"><strong>الرابط القصير الخاص بك:</strong></p>
+    <input type="text" id="finalShortUrlResult" readonly onclick="this.select()">
+    <button class="copy-btn-fluent" onclick="copyFinalLink()">نسخ الرابط</button>
+  </div>
 </div>
 
+<!-- تنسيق مظهر احترافي متوافق بالكامل مع شاشات الهواتف وقوالب الويب -->
+<style>
+.ultimate-shortener-box {
+  background: #f8fafc;
+  border: 2px solid #6366f1;
+  border-radius: 16px;
+  padding: 25px;
+  max-width: 500px;
+  margin: 20px auto;
+  text-align: center;
+  font-family: Arial, sans-serif;
+  direction: rtl;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+.ultimate-shortener-box h3 { color: #6366f1; margin-top: 0; font-size: 22px; }
+.ultimate-shortener-box p { color: #64748b; font-size: 14px; }
+.ultimate-shortener-box input[type="url"], .ultimate-shortener-box input[type="text"] {
+  width: 90%;
+  padding: 12px;
+  margin: 12px 0;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  text-align: left;
+  direction: ltr;
+  font-size: 16px;
+}
+.ultimate-shortener-box button {
+  background-color: #6366f1;
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  width: 95%;
+  transition: background 0.2s;
+}
+.ultimate-shortener-box button:hover { background-color: #4f46e5; }
+.ultimate-shortener-box .copy-btn-fluent { background-color: #10b981; margin-top: 5px; }
+.ultimate-shortener-box .copy-btn-fluent:hover { background-color: #059669; }
+</style>
+
+<!-- السكربت البرمجي الذكي المقاوم للحظر وحظر الأمان تماماً -->
 <script>
-function runLocalShortener() {
-    const urlInput = document.getElementById("long_url_input").value.trim();
-    const resultBox = document.getElementById("result_box");
-    const urlOutput = document.getElementById("short_url_output");
-    
-    if (!urlInput) {
-        alert("الرجاء إدخال رابط صحيح أولاً");
-        return;
-    }
-    
-    urlOutput.value = "جاري التوليد الفوري...";
-    resultBox.style.display = "block";
-    
-    try {
-        // آلية تشفير وبناء رابط ذكي محلي فريد يتخطى قيود الشبكة وحظر المتصفحات 100%
-        const encodedUrl = btoa(encodeURIComponent(urlInput)).replace(/=/g, "");
-        const cleanBaseUrl = window.location.href.split('?')[0].split('#')[0];
-        const generatedShortLink = cleanBaseUrl + "?id=" + encodedUrl;
-        
-        // عرض النتيجة الفورية
-        urlOutput.value = generatedShortLink;
-    } catch (e) {
-        urlOutput.value = "خطأ في معالجة الرابط الأصلي";
-    }
+function startInstantShorten() {
+  const longUrlInput = document.getElementById('userLongUrl').value.trim();
+  const resultSection = document.getElementById('successResultSection');
+  const shortUrlOutput = document.getElementById('finalShortUrlResult');
+  
+  if (!longUrlInput) {
+    alert("الرجاء إدخال رابط صحيح أولاً");
+    return;
+  }
+  
+  shortUrlOutput.value = "جاري توليد الرابط وتخطي الحظر...";
+  resultSection.style.display = "block";
+  
+  // دمج الخدمة المباشرة المفتوحة عبر بروتوكول تحويل العناوين المباشر والمضمون (v.gd)
+  const apiUrl = "https://v.gd" + encodeURIComponent(longUrlInput) + "&callback=processGlobalResponse";
+  
+  // كسر حظر CORS عن طريق ضخ الطلب كعنصر script مستقل ومتوافق مع المتصفحات
+  const scriptElement = document.createElement('script');
+  scriptElement.src = apiUrl;
+  scriptElement.id = "jsonp_temp_script";
+  
+  // تنظيف أي محاولات سابقة معلقة لضمان الاستجابة الفورية
+  const oldScript = document.getElementById("jsonp_temp_script");
+  if(oldScript) { oldScript.remove(); }
+  
+  document.body.appendChild(scriptElement);
 }
 
-// تشغيل نظام التوجيه التلقائي الذكي عند فتح الرابط المقتصر
-window.onload = function() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const id = urlParams.get('id');
-    
-    if (id) {
-        try {
-            document.body.innerHTML = "<div style='text-align:center; margin-top:100px; font-family:Arial; color:white;'><h3>جاري تحويلك إلى الرابط بأمان عبر السحابة الذكية...</h3></div>";
-            
-            // محاولة فك التشفير واستعادة الرابط الأصلي بدقة
-            let padding = "";
-            if (id.length % 4 === 2) padding = "==";
-            else if (id.length % 4 === 3) padding = "=";
-            
-            const decodedUrl = decodeURIComponent(atob(id + padding));
-            
-            if (decodedUrl.startsWith("http")) {
-                window.location.href = decodedUrl;
-            } else {
-                alert("الرابط الموجه غير صالح!");
-            }
-        } catch(err) {
-            alert("حدث خطأ أثناء التوجيه السحابي.");
-        }
-    }
+// استقبال النتيجة وعرض الرابط القصير جداً فوراً
+function processGlobalResponse(data) {
+  const shortUrlOutput = document.getElementById('finalShortUrlResult');
+  if (data && data.shorturl) {
+    shortUrlOutput.value = data.shorturl; // سيظهر الرابط قصيراً جداً ومباشراً
+  } else if (data && data.errormessage) {
+    shortUrlOutput.value = "خطأ من الخادم: " + data.errormessage;
+  } else {
+    shortUrlOutput.value = "خطأ: تأكد من كتابة الرابط بشكل صحيح مثل https://google.com";
+  }
 }
 
-function copyLink() {
-  const copyText = document.getElementById("short_url_output");
-  if(copyText.value && !copyText.value.includes("جاري")) {
-    copyText.select();
-    copyText.setSelectionRange(0, 99999); // لدعم متصفحات الجوال
-    navigator.clipboard.writeText(copyText.value);
-    alert("تم نسخ الرابط الذكي بنجاح! 🎉");
+// دالة النسخ بضغطة زر واحدة من الجوال
+function copyFinalLink() {
+  const outputField = document.getElementById("finalShortUrlResult");
+  if(outputField.value && !outputField.value.includes("جاري")) {
+    outputField.select();
+    outputField.setSelectionRange(0, 99999); // توافق كامل مع متصفحات آيفون وأندرويد
+    navigator.clipboard.writeText(outputField.value);
+    alert("تم نسخ الرابط القصير بنجاح! 🎉");
   }
 }
 </script>
-
-</body>
-</html>
+<!-- نهاية الكود الجاهز -->
