@@ -1,78 +1,52 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مختصر الروابط مفتوح المصدر ببايثون</title>
+<!-- بداية أداة اختصار الروابط ببايثون -->
+<div class="tool-card" style="background: var(--card-bg, white); border: 1px solid var(--border, #ccc); border-radius: 12px; padding: 25px; max-width: 500px; margin: 30px auto; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); direction: rtl; font-family: Arial, sans-serif;">
+    <h3 style="color: var(--primary, #6366f1); margin-top: 0; font-size: 20px;">مختصر الروابط الذكي (Python)</h3>
+    <p style="color: var(--text, #333); font-size: 14px; margin-bottom: 15px;">أدخل الرابط الطويل ليتم معالجته بواسطة كود بايثون:</p>
     
-    <!-- تحميل بيئة تشغيل بايثون داخل المتصفح (PyScript) -->
-    <link rel="stylesheet" href="https://pyscript.net">
-    <script type="module" src="https://pyscript.net"></script>
-
-    <style>
-        body { font-family: Arial, sans-serif; background: #f4f7f6; padding: 20px; text-align: center; }
-        .container { max-width: 500px; margin: 50px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h2 { color: #24292e; }
-        input { width: 90%; padding: 12px; margin: 15px 0; border: 1px solid #ccc; border-radius: 6px; text-align: left; direction: ltr; font-size: 16px; }
-        button { background: #2ea44f; color: white; border: none; padding: 12px 25px; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; width: 95%; }
-        button:hover { background: #2c974b; }
-        .result-box { display: none; margin-top: 20px; padding-top: 20px; border-top: 1px dashed #ccc; }
-        .badge { background: #e1f5fe; color: #0288d1; padding: 5px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; }
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <h2>مختصر الروابط <span class="badge">بايثون مفتوح المصدر</span></h2>
-    <p>أدخل الرابط الطويل ليتم معالجته بواسطة كود Python داخل المتصفح:</p>
+    <input type="url" id="python_url_input" placeholder="https://example.com" style="width: 90%; padding: 12px; margin: 10px 0; border: 1px solid var(--border, #ccc); border-radius: 6px; text-align: left; direction: ltr; font-size: 16px;">
     
-    <input type="url" id="long_url_input" placeholder="https://example.com" required>
-    <button id="shorten_btn">تقصير باستخدام Python</button>
+    <button id="python_shorten_btn" style="background: var(--primary, #6366f1); color: white; border: none; padding: 12px 25px; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; width: 95%;">تقصير باستخدام Python</button>
     
-    <div id="result_section" class="result-box">
-        <p><strong>الرابط القصير الخاص بك:</strong></p>
-        <input type="text" id="short_url_output" readonly>
+    <div id="python_result_box" style="display: none; margin-top: 20px; padding-top: 20px; border-top: 1px dashed var(--border, #ccc);">
+        <p style="margin: 5px 0; color: var(--text, #333);"><strong>الرابط القصير الخاص بك:</strong></p>
+        <input type="text" id="python_url_output" readonly style="width: 90%; padding: 10px; background: rgba(0,0,0,0.02); border: 1px solid var(--primary, #6366f1); border-radius: 6px; text-align: left; direction: ltr; font-size: 16px; color: var(--primary, #6366f1); font-weight: bold;" onclick="this.select()">
     </div>
 </div>
 
-<!-- هنا نكتب كود بايثون الصافي (Python Core Code) الذي سيعمل على جيت هاب -->
+<!-- تحميل بيئة بايثون وتشغيل الكود في نفس المكان تلقائياً -->
+<link rel="stylesheet" href="https://pyscript.net">
+<script type="module" src="https://pyscript.net"></script>
+
 <script type="py">
 from pyscript import document
 import pyodide.http
-import json
 
-async def python_shorten_logic(event):
-    # 1. جلب المدخلات من واجهة المستخدم باستخدام بايثون
-    long_url_input = document.querySelector("#long_url_input")
-    short_url_output = document.querySelector("#short_url_output")
-    result_section = document.querySelector("#result_section")
+async def run_shortener(event):
+    url_input = document.querySelector("#python_url_input")
+    url_output = document.querySelector("#python_url_output")
+    result_box = document.querySelector("#python_result_box")
     
-    long_url = long_url_input.value.strip()
+    long_url = url_input.value.strip()
     
     if not long_url:
         document.window.alert("الرجاء إدخال رابط أولاً!")
         return
         
-    short_url_output.value = "جاري المعالجة ببايثون..."
-    result_section.style.display = "block"
+    url_output.value = "جاري المعالجة ببايثون..."
+    result_box.style.display = "block"
     
-    # 2. منطق الاتصال البرمجي بالخدمة المفتوحة (بايثون المتقدم)
     api_url = f"https://tinyurl.com{long_url}"
     
     try:
-        # إرسال طلب HTTP عبر بايثون مباشرة من المتصفح
         response = await pyodide.http.pyfetch(api_url, method="GET")
         if response.status == 200:
             short_url = await response.string()
-            short_url_output.value = short_url
+            url_output.value = short_url
         else:
-            short_url_output.value = "خطأ في استجابة الخادم"
+            url_output.value = "خطأ في استجابة الخادم"
     except Exception as e:
-        short_url_output.value = "فشل الاتصال البرمجي"
+        url_output.value = "فشل الاتصال البرمجي"
 
-# ربط زر الضغط بدالة بايثون
-document.querySelector("#shorten_btn").onclick = python_shorten_logic
+document.querySelector("#python_shorten_btn").onclick = run_shortener
 </script>
-
-</body>
-</html>
+<!-- نهاية أداة بايثون -->
