@@ -1,23 +1,107 @@
-<!-- بداية أداة اختصار الروابط ببايثون -->
-<div class="tool-card" style="background: var(--card-bg, white); border: 1px solid var(--border, #ccc); border-radius: 12px; padding: 25px; max-width: 500px; margin: 30px auto; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); direction: rtl; font-family: Arial, sans-serif;">
-    <h3 style="color: var(--primary, #6366f1); margin-top: 0; font-size: 20px;">مختصر الروابط الذكي (Python)</h3>
-    <p style="color: var(--text, #333); font-size: 14px; margin-bottom: 15px;">أدخل الرابط الطويل ليتم معالجته بواسطة كود بايثون:</p>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مركز الأدوات الذكية الشامل</title>
     
-    <input type="url" id="python_url_input" placeholder="https://example.com" style="width: 90%; padding: 12px; margin: 10px 0; border: 1px solid var(--border, #ccc); border-radius: 6px; text-align: left; direction: ltr; font-size: 16px;">
-    
-    <button id="python_shorten_btn" style="background: var(--primary, #6366f1); color: white; border: none; padding: 12px 25px; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; width: 95%;">تقصير باستخدام Python</button>
-    
-    <div id="python_result_box" style="display: none; margin-top: 20px; padding-top: 20px; border-top: 1px dashed var(--border, #ccc);">
-        <p style="margin: 5px 0; color: var(--text, #333);"><strong>الرابط القصير الخاص بك:</strong></p>
-        <input type="text" id="python_url_output" readonly style="width: 90%; padding: 10px; background: rgba(0,0,0,0.02); border: 1px solid var(--primary, #6366f1); border-radius: 6px; text-align: left; direction: ltr; font-size: 16px; color: var(--primary, #6366f1); font-weight: bold;" onclick="this.select()">
-        <button onclick="jsCopyLink()" style="background: #28a745; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-size: 14px; width: 95%; margin-top: 8px; font-weight: bold;">نسخ الرابط</button>
+    <!-- تحميل بيئة بايثون المضمونة للويب داخل الرأس لتعمل بكفاءة -->
+    <link rel="stylesheet" href="https://pyscript.net">
+    <script type="module" src="https://pyscript.net"></script>
+
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%);
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --sidebar-bg: rgba(255, 255, 255, 0.85);
+            --text: #0f172a;
+            --border: rgba(226, 232, 240, 0.8);
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            background: var(--bg-gradient);
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            color: var(--text);
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 30px auto;
+        }
+
+        .tool-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        h2, h3 { color: var(--primary); margin-top: 0; }
+        
+        input[type="url"], input[type="text"] {
+            width: 90%;
+            padding: 12px;
+            margin: 15px 0;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            text-align: left;
+            direction: ltr;
+            font-size: 16px;
+        }
+
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            width: 95%;
+            transition: background 0.2s;
+        }
+
+        button:hover { background: var(--primary-hover); }
+        .copy-btn { background: #10b981; margin-top: 8px; }
+        .copy-btn:hover { background: #059669; }
+        
+        .result-box {
+            display: none;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed #cbd5e1;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- أداة اختصار الروابط المدمجة في جسم الصفحة -->
+    <div class="tool-card">
+        <h3>مركز الأدوات الذكية الشامل</h3>
+        <p style="font-size: 14px; color: #64748b;">أداة اختصار الروابط المفتوحة والمشغلة بواسطة كود Python</p>
+        
+        <input type="url" id="python_url_input" placeholder="https://example.com" required>
+        <button id="python_shorten_btn">تقصير باستخدام Python</button>
+        
+        <div id="python_result_box" class="result-box">
+            <p style="margin: 5px 0;"><strong>الرابط القصير الخاص بك:</strong></p>
+            <input type="text" id="python_url_output" readonly onclick="this.select()">
+            <button onclick="jsCopyLink()" class="copy-btn">نسخ الرابط</button>
+        </div>
     </div>
 </div>
 
-<!-- تحميل بيئة بايثون للويب وتأمين تشغيلها داخلياً -->
-<link rel="stylesheet" href="https://pyscript.net">
-<script type="module" src="https://pyscript.net"></script>
-
+<!-- كود بايثون التنفيذي مدمج داخل وسم الـ body ليعمل فوراً -->
 <script type="py">
 from pyscript import document
 import pyodide.http
@@ -36,6 +120,7 @@ async def run_shortener(event):
     url_output.value = "جاري المعالجة ببايثون..."
     result_box.style.display = "block"
     
+    # طلب التقصير البرمجي عبر بروتوكول TinyURL المفتوح
     api_url = f"https://tinyurl.com{long_url}"
     
     try:
@@ -56,10 +141,12 @@ function jsCopyLink() {
   var copyText = document.getElementById("python_url_output");
   if(copyText.value && !copyText.value.includes("جاري")) {
     copyText.select();
-    copyText.setSelectionRange(0, 99999); // مخصص لمتصفحات الهواتف الذكية
+    copyText.setSelectionRange(0, 99999);
     navigator.clipboard.writeText(copyText.value);
     alert("تم نسخ الرابط القصير بنجاح!");
   }
 }
 </script>
-<!-- نهاية أداة بايثون المتكاملة -->
+
+</body>
+</html>
