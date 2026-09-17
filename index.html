@@ -5,10 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>مركز الأدوات الذكية الشامل</title>
     
-    <!-- تحميل بيئة بايثون المضمونة للويب داخل الرأس لتعمل بكفاءة -->
-    <link rel="stylesheet" href="https://pyscript.net">
-    <script type="module" src="https://pyscript.net"></script>
-
     <style>
         :root {
             --primary: #6366f1;
@@ -44,7 +40,7 @@
             backdrop-filter: blur(10px);
         }
 
-        h2, h3 { color: var(--primary); margin-top: 0; }
+        h3 { color: var(--primary); margin-top: 0; }
         
         input[type="url"], input[type="text"] {
             width: 90%;
@@ -85,13 +81,13 @@
 <body>
 
 <div class="container">
-    <!-- أداة اختصار الروابط المدمجة في جسم الصفحة -->
+    <!-- أداة اختصار الروابط الذكية السريعة -->
     <div class="tool-card">
         <h3>مركز الأدوات الذكية الشامل</h3>
-        <p style="font-size: 14px; color: #64748b;">أداة اختصار الروابط المفتوحة والمشغلة بواسطة كود Python</p>
+        <p style="font-size: 14px; color: #64748b;">أداة اختصار الروابط المفتوحة والسريعة للمتصفح والهاتف</p>
         
         <input type="url" id="python_url_input" placeholder="https://example.com" required>
-        <button id="python_shorten_btn">تقصير باستخدام Python</button>
+        <button id="python_shorten_btn" onclick="runShortener()">تقصير الرابط الآن</button>
         
         <div id="python_result_box" class="result-box">
             <p style="margin: 5px 0;"><strong>الرابط القصير الخاص بك:</strong></p>
@@ -101,42 +97,41 @@
     </div>
 </div>
 
-<!-- كود بايثون التنفيذي مدمج داخل وسم الـ body ليعمل فوراً -->
-<script type="py">
-from pyscript import document
-import pyodide.http
-
-async def run_shortener(event):
-    url_input = document.querySelector("#python_url_input")
-    url_output = document.querySelector("#python_url_output")
-    result_box = document.querySelector("#python_result_box")
-    
-    long_url = url_input.value.strip()
-    
-    if not long_url:
-        document.window.alert("الرجاء إدخال رابط أولاً!")
-        return
-        
-    url_output.value = "جاري المعالجة ببايثون..."
-    result_box.style.display = "block"
-    
-    # طلب التقصير البرمجي عبر بروتوكول TinyURL المفتوح
-    api_url = f"https://tinyurl.com{long_url}"
-    
-    try:
-        response = await pyodide.http.pyfetch(api_url, method="GET")
-        if response.status == 200:
-            short_url = await response.string()
-            url_output.value = short_url
-        else:
-            url_output.value = "خطأ في استجابة الخادم"
-    except Exception as e:
-        url_output.value = "فشل الاتصال البرمجي"
-
-document.querySelector("#python_shorten_btn").onclick = run_shortener
-</script>
-
 <script>
+function runShortener() {
+    var urlInput = document.getElementById("python_url_input");
+    var urlOutput = document.getElementById("python_url_output");
+    var resultBox = document.getElementById("python_result_box");
+    
+    var longUrl = urlInput.value.trim();
+    
+    if (!longUrl) {
+        alert("الرجاء إدخال رابط أولاً!");
+        return;
+    }
+    
+    urlOutput.value = "جاري المعالجة الفورية...";
+    resultBox.style.display = "block";
+    
+    // استخدام واجهة تشغيل مفتوحة ومباشرة لتجنب مشاكل الحظر
+    var apiUrl = "https://tinyurl.com" + encodeURIComponent(longUrl);
+    
+    fetch(apiUrl)
+    .then(function(response) {
+        return response.text();
+    })
+    .then(function(shortUrl) {
+        if (shortUrl.startsWith("http")) {
+            urlOutput.value = shortUrl;
+        } else {
+            urlOutput.value = "خطأ في معالجة الرابط الأصلي";
+        }
+    })
+    .catch(function(error) {
+        urlOutput.value = "فشل الاتصال؛ يرجى التحقق من الشبكة";
+    });
+}
+
 function jsCopyLink() {
   var copyText = document.getElementById("python_url_output");
   if(copyText.value && !copyText.value.includes("جاري")) {
