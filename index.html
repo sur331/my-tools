@@ -1,147 +1,108 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مركز الأدوات الذكية الشامل</title>
-    
-    <style>
-        :root {
-            --primary: #6366f1;
-            --primary-hover: #4f46e5;
-            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%);
-            --card-bg: rgba(255, 255, 255, 0.95);
-            --sidebar-bg: rgba(255, 255, 255, 0.85);
-            --text: #0f172a;
-            --border: rgba(226, 232, 240, 0.8);
-        }
-
-        body {
-            margin: 0;
-            padding: 20px;
-            background: var(--bg-gradient);
-            font-family: Arial, sans-serif;
-            min-height: 100vh;
-            color: var(--text);
-        }
-
-        .container {
-            max-width: 600px;
-            margin: 30px auto;
-        }
-
-        .tool-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 30px;
-            text-align: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            backdrop-filter: blur(10px);
-        }
-
-        h3 { color: var(--primary); margin-top: 0; }
-        
-        input[type="url"], input[type="text"] {
-            width: 90%;
-            padding: 12px;
-            margin: 15px 0;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            text-align: left;
-            direction: ltr;
-            font-size: 16px;
-        }
-
-        button {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            width: 95%;
-            transition: background 0.2s;
-        }
-
-        button:hover { background: var(--primary-hover); }
-        .copy-btn { background: #10b981; margin-top: 8px; }
-        .copy-btn:hover { background: #059669; }
-        
-        .result-box {
-            display: none;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px dashed #cbd5e1;
-        }
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <!-- أداة اختصار الروابط الذكية السريعة -->
-    <div class="tool-card">
-        <h3>مركز الأدوات الذكية الشامل</h3>
-        <p style="font-size: 14px; color: #64748b;">أداة اختصار الروابط المفتوحة والسريعة للمتصفح والهاتف</p>
-        
-        <input type="url" id="python_url_input" placeholder="https://example.com" required>
-        <button id="python_shorten_btn" onclick="runShortener()">تقصير الرابط الآن</button>
-        
-        <div id="python_result_box" class="result-box">
-            <p style="margin: 5px 0;"><strong>الرابط القصير الخاص بك:</strong></p>
-            <input type="text" id="python_url_output" readonly onclick="this.select()">
-            <button onclick="jsCopyLink()" class="copy-btn">نسخ الرابط</button>
-        </div>
-    </div>
+<!-- صندوق أداة اختصار الروابط النهائي لمدونة بلوجر عبر كلاود فلير -->
+<div class="cloudflare-shortener-box">
+  <h3>مركز الأدوات الذكية الشامل</h3>
+  <p>أدخل الرابط الطويل في الأسفل للحصول على رابط قصير فوراً وبضغطة زر:</p>
+  
+  <input type="url" id="bloggerLongUrl" placeholder="ضع الرابط هنا... https://example.com" required>
+  <button id="shortenBtn" onclick="executeCloudflareShorten()">تقصير الرابط الآن</button>
+  
+  <div id="bloggerResultSection" style="display:none; margin-top:20px; padding-top:15px; border-top:1px dashed #cbd5e1;">
+    <p style="margin:5px 0;"><strong>الرابط القصير الخاص بك:</strong></p>
+    <input type="text" id="bloggerShortUrlResult" readonly onclick="this.select()">
+    <button class="copy-btn-smart" onclick="copyBloggerLink()">نسخ الرابط</button>
+  </div>
 </div>
 
+<!-- تنسيق المظهر متوافق مع الهاتف وقوالب بلوجر وجيت هاب -->
+<style>
+.cloudflare-shortener-box {
+  background: #f8fafc;
+  border: 2px solid #f38020; /* لون كلاود فلير الرسمي البرتقالي */
+  border-radius: 16px;
+  padding: 25px;
+  max-width: 500px;
+  margin: 20px auto;
+  text-align: center;
+  font-family: Arial, sans-serif;
+  direction: rtl;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+.cloudflare-shortener-box h3 { color: #f38020; margin-top: 0; font-size: 22px; }
+.cloudflare-shortener-box p { color: #64748b; font-size: 14px; }
+.cloudflare-shortener-box input[type="url"], .cloudflare-shortener-box input[type="text"] {
+  width: 90%;
+  padding: 12px;
+  margin: 12px 0;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  text-align: left;
+  direction: ltr;
+  font-size: 16px;
+}
+.cloudflare-shortener-box button {
+  background-color: #f38020;
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  width: 95%;
+  transition: background 0.2s;
+}
+.cloudflare-shortener-box button:hover { background-color: #df6d0f; }
+.cloudflare-shortener-box .copy-btn-smart { background-color: #10b981; margin-top: 5px; }
+.cloudflare-shortener-box .copy-btn-smart:hover { background-color: #059669; }
+</style>
+
+<!-- السكربت البرمجي المحدث لكسر الحظر وتخطي أخطاء الشبكة عبر شبكة كلاود فلير -->
 <script>
-function runShortener() {
-    var urlInput = document.getElementById("python_url_input");
-    var urlOutput = document.getElementById("python_url_output");
-    var resultBox = document.getElementById("python_result_box");
-    
-    var longUrl = urlInput.value.trim();
-    
-    if (!longUrl) {
-        alert("الرجاء إدخال رابط أولاً!");
-        return;
-    }
-    
-    urlOutput.value = "جاري المعالجة الفورية...";
-    resultBox.style.display = "block";
-    
-    // استخدام واجهة تشغيل مفتوحة ومباشرة لتجنب مشاكل الحظر
-    var apiUrl = "https://tinyurl.com" + encodeURIComponent(longUrl);
-    
-    fetch(apiUrl)
-    .then(function(response) {
-        return response.text();
+function executeCloudflareShorten() {
+  const longUrl = document.getElementById('bloggerLongUrl').value.trim();
+  const resultSection = document.getElementById('bloggerResultSection');
+  const shortUrlResult = document.getElementById('bloggerShortUrlResult');
+  
+  if (!longUrl) {
+    alert("الرجاء إدخال رابط صحيح أولاً");
+    return;
+  }
+  
+  shortUrlResult.value = "جاري المعالجة عبر Cloudflare...";
+  resultSection.style.display = "block";
+  
+  // الرابط المستهدف النهائي للاختصار المباشر
+  const targetApi = "https://tinyurl.com" + encodeURIComponent(longUrl);
+  
+  // دمج الرابط مع خادم بروكسي مفتوح يعمل بالكامل تحت حماية شبكة وكلاود فلير (Cors-anywhere البديل)
+  const cloudflareProxiedUrl = "https://allorigins.win" + encodeURIComponent(targetApi);
+  
+  fetch(cloudflareProxiedUrl)
+    .then(response => {
+      if (!response.ok) throw new Error();
+      return response.json(); // ऑलऑरिजिन्स يعيد النتيجة داخل كائن كود جافاسكربت
     })
-    .then(function(shortUrl) {
-        if (shortUrl.startsWith("http")) {
-            urlOutput.value = shortUrl;
-        } else {
-            urlOutput.value = "خطأ في معالجة الرابط الأصلي";
-        }
+    .then(data => {
+      const shortUrl = data.contents;
+      if (shortUrl && shortUrl.startsWith("http")) {
+        shortUrlResult.value = shortUrl;
+      } else {
+        shortUrlResult.value = "خطأ: تأكد من كتابة الرابط بشكل صحيح";
+      }
     })
-    .catch(function(error) {
-        urlOutput.value = "فشل الاتصال؛ يرجى التحقق من الشبكة";
+    .catch(() => {
+      shortUrlResult.value = "فشل الاتصال عبر السيرفر السحابي؛ يرجى المحاولة لاحقاً";
     });
 }
 
-function jsCopyLink() {
-  var copyText = document.getElementById("python_url_output");
+function copyBloggerLink() {
+  const copyText = document.getElementById("bloggerShortUrlResult");
   if(copyText.value && !copyText.value.includes("جاري")) {
     copyText.select();
     copyText.setSelectionRange(0, 99999);
     navigator.clipboard.writeText(copyText.value);
-    alert("تم نسخ الرابط القصير بنجاح!");
+    alert("تم نسخ الرابط القصير بنجاح! 🎉");
   }
 }
 </script>
-
-</body>
-</html>
+<!-- نهاية كود كلاود فلير الجاهز الشامل -->
